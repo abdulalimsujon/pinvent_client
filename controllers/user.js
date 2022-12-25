@@ -9,6 +9,7 @@ const bcrypt = require('bcryptjs');
 
 
 
+
 //create token
 
 const generateToken = (id) => {
@@ -194,9 +195,59 @@ const getUser = asyncHandler(async (req, res) => {
     }
 });
 
-// const LoginStatus = asyncHandler(async (req, res) => {
+// get login status 
+const LoginStatus = asyncHandler(async (req, res) => {
 
-// })
+    const token = req.cookies.token;
+    if (!token) {
+        return res.json(false)
+    } else {
+        return res.json(true)
+    }
+
+    const verified = jwt.verify(token, process.env.JWT_TOKEN_SECRATE)
+
+    if (!verified) {
+        return res.json(false)
+
+    } else {
+        return res.json(true)
+    }
+
+})
+
+const updateUser = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.user._id);
+
+
+    if (user) {
+        const { name, email, photo, phone, bio } = user;
+
+        user.email = email,
+            user.name = req.body.name || name,
+            user.photo = req.body.photo || photo,
+            user.phone = req.body.phone || phone,
+            user.bio = req.body.bio || bio
+
+        const updatedUser = await user.save();
+
+        res.status(200).json({
+
+            _id: updatedUser._id,
+            name: updatedUser.name,
+            email: updateUser.email,
+            photo: updateUser.photo,
+            phone: updateUser.phone,
+            bio: updateUser.bio
+        })
+
+    } else {
+        res.status(404)
+        throw new Error('user not found');
+    }
+
+
+})
 
 
 
@@ -206,5 +257,7 @@ module.exports = {
     loginUser,
     logOut,
     getSingleUser,
-    getUser
+    getUser,
+    LoginStatus,
+    updateUser
 }

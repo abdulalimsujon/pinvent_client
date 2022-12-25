@@ -3,7 +3,7 @@ const asyncHandler = require("express-async-handler");
 var jwt = require('jsonwebtoken');
 
 const User = require('../models/user')
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 
 
@@ -13,8 +13,7 @@ const bcrypt = require('bcrypt');
 
 const generateToken = (id) => {
 
-    return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "7d" });
-
+    return jwt.sign({ id }, process.env.JWT_TOKEN_SECRATE, { expiresIn: "7d" });
 }
 
 //register user
@@ -60,9 +59,8 @@ const registerUser = asyncHandler(async (req, res) => {
         httpOnly: true,
         expires: new Date(Date.now() + 7 * 1000 * 86400), // 7 day
         sameSite: "none",
-        secure: true,
+        // secure: true,
     });
-
 
     if (user) {
         const { _id, name, email, photo, phone, bio } = user;
@@ -150,9 +148,9 @@ const logOut = asyncHandler(async (req, res) => {
 
 })
 
-// get User 
+// get single User 
 
-const getUser = asyncHandler(async (req, res) => {
+const getSingleUser = asyncHandler(async (req, res) => {
 
     const user = await User.findById(req.params.id);
 
@@ -174,11 +172,39 @@ const getUser = asyncHandler(async (req, res) => {
     }
 
 })
+// Get User Data
+
+const getUser = asyncHandler(async (req, res) => {
+
+    const user = await User.findById(req.user._id);
+
+    if (user) {
+        const { _id, name, email, photo, phone, bio } = user;
+        res.status(200).json({
+            _id,
+            name,
+            email,
+            photo,
+            phone,
+            bio,
+        });
+    } else {
+        res.status(400);
+        throw new Error("User Not Found");
+    }
+});
+
+// const LoginStatus = asyncHandler(async (req, res) => {
+
+// })
+
+
 
 
 module.exports = {
     registerUser,
     loginUser,
     logOut,
+    getSingleUser,
     getUser
 }

@@ -3,33 +3,42 @@ const asyncHandler = require('express-async-handler')
 
 const User = require('../models/user')
 
-const protect = asyncHandler(async (req, res) => {
+const protect = asyncHandler(async (req, res, next) => {
 
-    const token = req.cookies.token; //get token
-    if (!token) {
+    try {
+        const token = req.cookies.token; //get token
+        if (!token) {
+            res.status(401);
+
+            throw new Error('Not authorized !! please login !!1')
+        }
+
+        //verify token 
+
+        const verify = jwt.verify(token, process.env.JWT_TOKEN_SECRATE);
+
+        if (!verify) {
+            res.status(401);
+
+            throw new Error('Not authorized !! please login !!2')
+        }
+
+        const user = await User.findById(verify.id).select("-password");
+
+        if (!user) {
+            res.status(401);
+            throw new error('user not found')
+        } else {
+            req.user = user;
+            next();
+        }
+
+    } catch {
         res.status(401);
-
-        throw new Error('Not authorized !! please login !!')
+        throw new Error("Not authorized, please login3");
     }
 
-    //verify token 
 
-    const verify = jwt.verify(token, process.env.WEB_TOKEN_SECRATE);
-
-    if (!verify) {
-        res.status(401);
-
-        throw new Error('Not authorized !! please login !!')
-    }
-
-    const user = await User.findById(verify.cookies.id).select("-password");
-
-    if (!user) {
-        res.status(401);
-        throw new error('Not authorized !! please login !!!')
-    } else {
-        req.user = user;
-    }
 
 
 })

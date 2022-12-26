@@ -216,6 +216,8 @@ const LoginStatus = asyncHandler(async (req, res) => {
 
 })
 
+/// updated user 
+
 const updateUser = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user._id);
 
@@ -251,6 +253,42 @@ const updateUser = asyncHandler(async (req, res) => {
 
 
 
+// updated password 
+
+const updatedPassword = asyncHandler(async (req, res) => {
+
+    const user = await User.findById(req.user._id)
+
+    const { oldPassword, newPassword } = req.body;
+
+    if (!oldPassword || !newPassword) {
+        res.status(400);
+        throw new Error('Please add old and new password');
+    }
+
+    if (!user) {
+        res.status(400);
+        throw new Error('please login !!')
+    }
+
+    if (user && oldPassword && newPassword) {
+        user.password = newPassword;
+
+        await user.save();
+
+        res.status(200).json('password updated successfully')
+
+    } else {
+        res.status(400)
+        throw new Error('provide all')
+    }
+
+
+
+})
+
+
+
 
 module.exports = {
     registerUser,
@@ -259,5 +297,6 @@ module.exports = {
     getSingleUser,
     getUser,
     LoginStatus,
-    updateUser
+    updateUser,
+    updatedPassword
 }

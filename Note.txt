@@ -1,0 +1,28 @@
+register  the user
+
+step 1: create the user model
+step 2: we can get the model entry req.body from the fronded
+step 3:to use the User model we can  create user and save the db and get as register user
+step 4:then to create cookie we send send token 
+step 5: here we also send user information response 
+
+
+login the user
+
+step 1: get the email password from the req.body
+step 2: find the user from the db
+step 3: using bcrypt we compare the password
+step 4:then create token and and pass the cookie
+step 5: if the get user and password correctly we give the user as response
+
+
+logout the user 
+
+step 1: simply we empty the cookie as logout and donot give any user information
+
+
+
+login status :
+
+step 1: we collect token from the cookie if not token then false status
+step 2:compare token from the env file
